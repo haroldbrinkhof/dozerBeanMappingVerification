@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns="http://dozer.sourceforge.net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://dozer.sourceforge.net/schema/beanmapping.xsd">
+
+    <!-- Cancel -->
+    <mapping type="one-way">
+        <class-a>be.catsandcoding.dozer.mappings.PreSuccess</class-a>
+        <class-b>be.catsandcoding.dozer.mappings.Success</class-b>
+        <field>
+            <a>notFound</a>
+            <b>success</b>
+        </field>
+    </mapping>
+
+</mappings>

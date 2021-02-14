@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns="http://dozer.sourceforge.net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://dozer.sourceforge.net/schema/beanmapping.xsd">
+
+    <configuration>
+        <stop-on-errors>true</stop-on-errors>
+        <date-format>MM/dd/yyyy HH:mm:ss:SS</date-format>
+        <wildcard>true</wildcard>
+
+        <!-- Default converters -->
+        <custom-converters>
+            <converter type="be.catsandcoding.dozer.CustomConverter">
+                <class-a>java.lang.String</class-a>
+                <class-b>be.catsandcoding.dozer.components.XmlParser</class-b>
+            </converter>
+        </custom-converters>
+
+        <allowed-exceptions>
+            <exception>org.dozer.MappingException</exception>
+        </allowed-exceptions>
+
+    </configuration>
+
+</mappings>
