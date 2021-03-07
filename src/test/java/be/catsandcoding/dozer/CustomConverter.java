@@ -1,21 +1,20 @@
 package be.catsandcoding.dozer;
 
-import be.catsandcoding.dozer.components.XmlParser;
 import org.dozer.DozerConverter;
 
-public class CustomConverter extends DozerConverter<String, XmlParser> {
+public class CustomConverter extends DozerConverter<String, Boolean> {
 
-    public CustomConverter(Class<String> prototypeA, Class<XmlParser> prototypeB) {
+    public CustomConverter(Class<String> prototypeA, Class<Boolean> prototypeB) {
         super(prototypeA, prototypeB);
     }
 
     @Override
-    public XmlParser convertTo(String s, XmlParser xmlParser) {
+    public Boolean convertTo(String s, Boolean xmlParser) {
         return xmlParser;
     }
 
     @Override
-    public String convertFrom(XmlParser xmlParser, String s) {
+    public String convertFrom(Boolean xmlParser, String s) {
         return s;
     }
 }

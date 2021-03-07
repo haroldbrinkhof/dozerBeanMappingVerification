@@ -11,7 +11,7 @@
         <custom-converters>
             <converter type="be.catsandcoding.dozer.CustomConverter">
                 <class-a>java.lang.String</class-a>
-                <class-b>be.catsandcoding.dozer.components.XmlParser</class-b>
+                <class-b>java.lang.Boolean</class-b>
             </converter>
         </custom-converters>
 

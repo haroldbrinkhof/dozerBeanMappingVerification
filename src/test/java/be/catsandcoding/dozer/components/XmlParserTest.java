@@ -1,52 +1,78 @@
 package be.catsandcoding.dozer.components;
 
+import be.catsandcoding.dozer.Options;
+import be.catsandcoding.dozer.generated.ConverterType;
+import be.catsandcoding.dozer.generated.Field;
+import be.catsandcoding.dozer.generated.Mappings;
+import be.catsandcoding.dozer.generated.Type;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
+import javax.xml.bind.JAXBException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class XmlParserTest {
 
+    private static Method getMappingsForFile;
+    private static Verifier verifier;
+    @BeforeAll
+    public static void setup() throws NoSuchMethodException, JAXBException {
+        verifier = new Verifier(new Options());
+        getMappingsForFile = Verifier.class.getDeclaredMethod("getMappingsForFile",String.class);
+        getMappingsForFile.setAccessible(true);
+    }
 
-    @Test
-    public void getMappings_happyPath() throws ParserConfigurationException, SAXException, IOException {
-        List<XmlParser.Mapping> actual = new XmlParser().parseServiceConfig("be/catsandcoding/dozer/mappings/SuccessMapping.xml");
-
-        Assertions.assertEquals(2, actual.size());
-        Assertions.assertEquals("be.catsandcoding.dozer.mappings.PreSuccess", actual.get(0).getFrom());
-        Assertions.assertEquals("be.catsandcoding.dozer.mappings.Success", actual.get(0).getTo());
-
-
-        Assertions.assertEquals(1, actual.get(0).getFields().size());
-        Assertions.assertTrue(actual.get(0).isOneWay());
-        Assertions.assertEquals("customField", actual.get(0).getFields().get(0).getFrom());
-        Assertions.assertEquals("success", actual.get(0).getFields().get(0).getTo());
-
-
-        Assertions.assertEquals(2, actual.get(1).getFields().size());
-        Assertions.assertFalse(actual.get(1).isOneWay());
-        Assertions.assertEquals("littleLuck", actual.get(1).getFields().get(0).getFrom());
-        Assertions.assertEquals("success", actual.get(1).getFields().get(0).getTo());
-        Assertions.assertEquals("be.catsandcoding.dozer.mappings.MazzeltjeToSuccessConvertor", actual.get(1).getFields().get(0).getConverter());
-
-        Assertions.assertEquals("failure", actual.get(1).getFields().get(1).getFrom());
-        Assertions.assertEquals("failure", actual.get(1).getFields().get(1).getTo());
-        Assertions.assertNull(actual.get(1).getFields().get(1).getConverter());
+    private String getAbsolutePath(String path) throws URISyntaxException {
+        return Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource(path)).toURI().toString();
     }
 
     @Test
-    public void getMainConfig_happyPath() throws ParserConfigurationException, SAXException, IOException {
+    public void getMappings_happyPath() throws JAXBException, URISyntaxException, InvocationTargetException, IllegalAccessException {
+        String path = "be/catsandcoding/dozer/mappings/SuccessMapping.xml";
+        Mappings actual = (Mappings)getMappingsForFile.invoke(verifier,getAbsolutePath(path));
+
+        Assertions.assertEquals(2, actual.getMapping().size());
+        Assertions.assertEquals("be.catsandcoding.dozer.mappings.PreSuccess", actual.getMapping().get(0).getClassA().getContent());
+        Assertions.assertEquals("be.catsandcoding.dozer.mappings.Success", actual.getMapping().get(0).getClassB().getContent());
+
+
+        Assertions.assertEquals(Type.ONE_WAY, actual.getMapping().get(0).getType());
+        List<Field> fields = actual.getMapping().get(0).getFieldOrFieldExclude().stream()
+                .filter(field -> field instanceof Field).map(f -> (Field)f).collect(Collectors.toList());
+        Assertions.assertEquals("customField", fields.get(0).getA().getContent());
+        Assertions.assertEquals("success", fields.get(0).getB().getContent());
+
+
+        fields = actual.getMapping().get(1).getFieldOrFieldExclude().stream()
+                .filter(f -> f instanceof Field).map(f -> (Field)f).collect(Collectors.toList());
+        Assertions.assertEquals(Type.ONE_WAY, actual.getMapping().get(0).getType());
+        Assertions.assertEquals("littleLuck", fields.get(0).getA().getContent());
+        Assertions.assertEquals("success", fields.get(0).getB().getContent());
+        Assertions.assertEquals("be.catsandcoding.dozer.mappings.MazzeltjeToSuccessConvertor", fields.get(0).getCustomConverter());
+
+        Assertions.assertEquals("failure", fields.get(1).getA().getContent());
+        Assertions.assertEquals("failure", fields.get(1).getB().getContent());
+        Assertions.assertNull(fields.get(1).getCustomConverter());
+    }
+
+    @Test
+    public void getMainConfig_happyPath() throws URISyntaxException, InvocationTargetException, IllegalAccessException {
         String path = "be/catsandcoding/dozer/mappings/MainConfig.xml";
 
-        List<XmlParser.Field> actual = new XmlParser().parseMainConfig(path);
-        Assertions.assertEquals(1, actual.size());
-        Assertions.assertEquals("be.catsandcoding.dozer.CustomConverter", actual.get(0).getConverter());
-        Assertions.assertEquals("java.lang.String", actual.get(0).getFrom());
-        Assertions.assertEquals("be.catsandcoding.dozer.components.XmlParser", actual.get(0).getTo());
+        Mappings actual = (Mappings)getMappingsForFile.invoke(verifier, getAbsolutePath(path));
+        Assertions.assertEquals(1, actual.getConfiguration().getCustomConverters().getConverter().size());
+        List<ConverterType> converters = actual.getConfiguration().getCustomConverters().getConverter();
+
+        Assertions.assertEquals("be.catsandcoding.dozer.CustomConverter", converters.get(0).getType());
+        Assertions.assertEquals("java.lang.String", converters.get(0).getClassA().getContent());
+        Assertions.assertEquals("java.lang.Boolean", converters.get(0).getClassB().getContent());
 
     }
 }

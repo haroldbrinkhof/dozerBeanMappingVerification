@@ -1,0 +1,13 @@
+<jxb:bindings version="2.1" schemaLocation="./beanmapping.xsd"
+              xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+              xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd"
+              >
+    <jxb:schemaBindings>
+        <jxb:package name="be.catsandcoding.dozer.generated"/>
+    </jxb:schemaBindings>
+    <jxb:globalBindings>
+        <xjc:serializable uid="-1"/>
+    </jxb:globalBindings>
+</jxb:bindings>
